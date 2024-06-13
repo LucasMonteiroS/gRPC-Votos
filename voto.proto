@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+service VotingService {
+  rpc ComputarVoto(VoteRequest) returns (VoteResponse);
+  rpc ApuracaoVotos(ApuracaoRequest) returns (ApuracaoResponse);
+}
+
+message VoteRequest {
+  string cpf = 1;
+  int32 candidateNumber = 2;
+}
+
+message VoteResponse {
+  bool success = 1;
+}
+
+message ApuracaoRequest {}
+
+message VoteResult {
+  string candidate = 1;
+  int32 count = 2;
+  float percentage = 3;
+}
+
+message ApuracaoResponse {
+  repeated VoteResult results = 1;
+}
