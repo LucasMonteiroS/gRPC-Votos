@@ -21,19 +21,33 @@ const apurar = async () => {
 const main = async () => {
   try {
     const resultado = await apurar();
-    console.log("Resultados da Apuração:");
     const totalVotes = resultado.results.reduce((acc, row) => acc + row.count, 0);
+    let nenhumResultado = true
 
     if (resultado.results) {
-      resultado.results.forEach((row) => {
-        const percentage = ((row.count / totalVotes) * 100).toFixed(2);
-        console.log(`${row.candidate}: ${row.count} votos (${percentage}%)`);
+      resultado.results.forEach((item) => {
+        if (item.count != 0) {
+          nenhumResultado = false
+        }
+      })
+      if (nenhumResultado) {
+        console.log("Nenhum voto cadastrado !!!")
+      } else {
+        console.log("Resultados da Apuração:");
+        resultado.results.forEach((row) => {
+          const percentage = ((row.count / totalVotes) * 100).toFixed(2);
+          console.log(`${row.candidate}: ${row.count} votos (${percentage}%)`);
       });
+      }
     } else {
       console.log("Nenhum resultado encontrado.");
     }
   } catch (error) {
-    console.error("Erro ao obter apuração de votos:", error);
+    if(error?.details?.includes('No connection established')) {
+      console.log("Conexão não foi estabelecida com sucesso !!!")
+    } else {
+      console.log(error)
+    }
   }
 };
 

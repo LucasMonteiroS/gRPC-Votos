@@ -52,7 +52,12 @@ async function main() {
       console.log("");
       response.success ? console.log("Voto computado com sucesso!") : console.log("Erro ao computar voto!");
     } catch (error) {
-      console.error(error.details);
+      if(error?.details.includes('No connection established')) {
+        console.log("\nConexão não foi estabelecida com sucesso !!!\n")
+        break;
+      } else {
+        console.log(error)
+      }
     }
   }
 

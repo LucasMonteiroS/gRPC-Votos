@@ -7,7 +7,6 @@ Este projeto tem o intuito de implementar um sistema de votação distribuído, 
 Para executar este projeto, você precisa ter os seguintes requisitos instalados:
 
 - Node.js (v20.11.1 ou superior);
-- npm;
 - SQLite (certifique-se de que o SQLite esteja instalado e configurado no seu sistema operacional);
 
 ## Instalação
