@@ -1,8 +1,9 @@
 syntax = "proto3";
 
 service VotingService {
-  rpc ComputarVoto(VoteRequest) returns (VoteResponse);
-  rpc ApuracaoVotos(ApuracaoRequest) returns (ApuracaoResponse);
+  rpc ComputarVoto (VoteRequest) returns (VoteResponse);
+  rpc ApuracaoVotos (ApuracaoRequest) returns (ApuracaoResponse);
+  rpc ListarCandidatos (CandidatoRequest) returns (CandidatoResponse);
 }
 
 message VoteRequest {
@@ -24,4 +25,15 @@ message VoteResult {
 
 message ApuracaoResponse {
   repeated VoteResult results = 1;
+}
+
+message CandidatoRequest {}
+
+message Candidate {
+  string name = 1;
+  int32 number = 2;
+}
+
+message CandidatoResponse {
+  repeated Candidate candidates = 1;
 }

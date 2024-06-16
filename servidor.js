@@ -1,6 +1,11 @@
-import { loadPackageDefinition, ServerCredentials, status, Server } from "@grpc/grpc-js";
+import {
+  loadPackageDefinition,
+  ServerCredentials,
+  status,
+  Server,
+} from "@grpc/grpc-js";
 import { loadSync } from "@grpc/proto-loader";
-import sqlite3 from 'sqlite3';
+import sqlite3 from "sqlite3";
 
 const db = new sqlite3.Database("voting.db");
 
@@ -30,7 +35,7 @@ db.serialize(() => {
     { name: "Lula", number: 13 },
     { name: "Bolsonaro", number: 22 },
     { name: "Véio da Van", number: 51 },
-    { name: "Nulo", number: 0 }
+    { name: "Nulo", number: 0 },
   ];
 
   candidates.forEach((candidate) => {
@@ -45,7 +50,7 @@ const votingDef = loadSync("./voto.proto");
 const votingProto = loadPackageDefinition({ ...votingDef });
 
 const grpcServer = new Server();
-grpcServer.addService(votingProto.VotingService.service, { 
+grpcServer.addService(votingProto.VotingService.service, {
   computarVoto: (call, callback) => {
     const { cpf, candidateNumber } = call.request;
     db.get("SELECT cpf FROM votes WHERE cpf = ?", [cpf], (err, row) => {
@@ -66,7 +71,7 @@ grpcServer.addService(votingProto.VotingService.service, {
         );
         return;
       }
-  
+
       db.get(
         "SELECT number FROM candidates WHERE number = ?",
         [candidateNumber],
@@ -85,7 +90,7 @@ grpcServer.addService(votingProto.VotingService.service, {
             );
             return;
           }
-  
+
           db.run(
             "INSERT INTO votes(cpf, candidateNumber) VALUES(?, ?)",
             [cpf, candidateNumber],
@@ -106,7 +111,7 @@ grpcServer.addService(votingProto.VotingService.service, {
         }
       );
     });
-  }, 
+  },
   apuracaoVotos: (call, callback) => {
     db.all(
       `
@@ -124,19 +129,37 @@ grpcServer.addService(votingProto.VotingService.service, {
           );
           return;
         }
-  
-        const results = rows.map(row => ({
+
+        const results = rows.map((row) => ({
           candidate: row.candidate,
-          count: row.count
+          count: row.count,
         }));
-  
+
         callback(null, { results });
       }
     );
-  }
+  },
+  listarCandidatos: (call, callback) => {
+    db.all("SELECT name, number FROM candidates", [], (err, rows) => {
+      if (err) {
+        callback(
+          { code: status.INTERNAL, message: "Erro no banco de dados" },
+          null
+        );
+        return;
+      }
+
+      const candidates = rows.map((row) => ({
+        name: row.name,
+        number: row.number,
+      }));
+
+      callback(null, { candidates });
+    });
+  },
 });
 
 const serverAddress = "127.0.0.1:50051";
 grpcServer.bindAsync(serverAddress, ServerCredentials.createInsecure(), () => {
-    console.log(`Servidor rodando em http://${serverAddress}`);
+  console.log(`Servidor rodando em http://${serverAddress}`);
 });
